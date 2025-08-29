@@ -74,6 +74,12 @@ func (h *APIHandler) SetupRoutes() *chi.Mux {
 			r.Get("/imei/{imei}", h.getLogsByIMEI)
 			r.Get("/serial/{serialNumber}", h.getLogsBySerialNumber)
 		})
+
+		// MQTT test routes
+		r.Route("/mqtt", func(r chi.Router) {
+			r.Post("/publish", h.publishMQTTMessage)
+			r.Get("/status", h.getMQTTStatus)
+		})
 	})
 
 	return r
@@ -328,6 +334,55 @@ func writeJSON(w http.ResponseWriter, status int, data interface{}) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
 	json.NewEncoder(w).Encode(data)
+}
+
+// publishMQTTMessage publishes a test message to MQTT
+func (h *APIHandler) publishMQTTMessage(w http.ResponseWriter, r *http.Request) {
+	var request struct {
+		Topic   string `json:"topic"`
+		Message string `json:"message"`
+	}
+
+	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
+		writeError(w, http.StatusBadRequest, "Invalid request body")
+		return
+	}
+
+	if request.Topic == "" {
+		writeError(w, http.StatusBadRequest, "Topic is required")
+		return
+	}
+
+	if MQTT == nil {
+		writeError(w, http.StatusServiceUnavailable, "MQTT client not available")
+		return
+	}
+
+	if err := MQTT.Publish(request.Topic, request.Message); err != nil {
+		writeError(w, http.StatusInternalServerError, fmt.Sprintf("Failed to publish message: %v", err))
+		return
+	}
+
+	writeJSON(w, http.StatusOK, map[string]interface{}{
+		"message": "Message published successfully",
+		"topic":   request.Topic,
+		"payload": request.Message,
+	})
+}
+
+// getMQTTStatus returns the current MQTT connection status
+func (h *APIHandler) getMQTTStatus(w http.ResponseWriter, r *http.Request) {
+	status := map[string]interface{}{
+		"connected": false,
+		"client":    nil,
+	}
+
+	if MQTT != nil {
+		status["connected"] = MQTT.IsConnected()
+		status["client"] = "available"
+	}
+
+	writeJSON(w, http.StatusOK, status)
 }
 
 // writeError writes an error response

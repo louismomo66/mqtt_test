@@ -333,17 +333,22 @@ func parseSensorArray(arrayStr string) [2]float64 {
 
 // handleDeviceData processes incoming device data messages
 func (m *MQTTClient) handleDeviceData(client mqtt.Client, msg mqtt.Message) {
+	fmt.Printf("Received MQTT message on topic: %s\n", msg.Topic())
+	fmt.Printf("Message payload: %s\n", string(msg.Payload()))
+
 	// Try to parse as URL-encoded data first
 	deviceData, err := parseDeviceData(string(msg.Payload()))
 	if err != nil {
+		fmt.Printf("URL parsing failed, trying JSON: %v\n", err)
 		// If URL parsing fails, try JSON parsing
 		if err := json.Unmarshal(msg.Payload(), &deviceData); err != nil {
-			fmt.Printf("Error parsing device data: %v", err)
+			fmt.Printf("JSON parsing also failed: %v\n", err)
+			fmt.Printf("Raw message: %s\n", string(msg.Payload()))
 			return
 		}
 	}
 
-	fmt.Printf("Received device data from IMEI: %s\n", deviceData.IMEI)
+	fmt.Printf("Successfully parsed device data from IMEI: %s\n", deviceData.IMEI)
 
 	if err := m.processDeviceData(deviceData); err != nil {
 		fmt.Printf("Error processing device data: %v", err)
@@ -352,7 +357,8 @@ func (m *MQTTClient) handleDeviceData(client mqtt.Client, msg mqtt.Message) {
 
 // handleLEDControl processes LED control messages
 func (m *MQTTClient) handleLEDControl(client mqtt.Client, msg mqtt.Message) {
-	fmt.Printf("Received LED control message: %s\n", string(msg.Payload()))
+	fmt.Printf("Received MQTT message on topic: %s\n", msg.Topic())
+	fmt.Printf("LED control message payload: %s\n", string(msg.Payload()))
 	// TODO: Implement LED control processing
 	// You can add logic here to control LEDs based on the message content
 }
