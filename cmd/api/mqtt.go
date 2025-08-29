@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/url"
-	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -48,11 +47,8 @@ type messageBuffer struct {
 var messageBuffers = make(map[string]*messageBuffer)
 
 func NewMQTTClient(models *data.Models) (*MQTTClient, error) {
-	// Get broker URL from environment variable
-	mqttBroker := os.Getenv("MQTT_BROKER")
-	if mqttBroker == "" {
-		mqttBroker = brokerURL
-	}
+	// Direct MQTT broker URL
+	mqttBroker := "tcp://mosquitto:1883"
 
 	opts := mqtt.NewClientOptions()
 	opts.AddBroker(mqttBroker)

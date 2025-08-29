@@ -4,17 +4,14 @@ import (
 	"fmt"
 	"log"
 	"mqtt/data"
-	"os"
 )
 
 var MQTT *MQTTClient
 
 func main() {
-	// Get database connection string from environment variable
-	dsn := os.Getenv("POSTGRES_DSN")
-	if dsn == "" {
-		dsn = "postgresql://mqtt_user:mqtt_password@localhost:5432/mqtt_db?sslmode=disable"
-	}
+	// Direct database connection string
+	dsn := "postgresql://mqtt_user:mqtt_password@postgres:5432/mqtt_db?sslmode=disable"
+	fmt.Printf("Using database connection: %s\n", dsn)
 
 	database, err := data.NewDatabase(dsn)
 	if err != nil {

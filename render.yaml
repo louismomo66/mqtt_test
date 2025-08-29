@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: mqtt-backend
+    env: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    plan: starter
+    envVars:
+      - key: POSTGRES_DSN
+        value: postgresql://mqtt_user:mqtt_password@postgres:5432/mqtt_db?sslmode=disable
+      - key: MQTT_BROKER
+        value: tcp://mosquitto:1883
+    healthCheckPath: /
+    autoDeploy: true
