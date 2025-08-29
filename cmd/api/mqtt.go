@@ -55,12 +55,20 @@ func NewMQTTClient(models *data.Models) (*MQTTClient, error) {
 	opts.SetClientID(clientID)
 	opts.SetUsername("hassan")
 	opts.SetPassword("ha55an")
-	opts.SetKeepAlive(60 * time.Second)
-	opts.SetPingTimeout(1 * time.Second)
+	opts.SetKeepAlive(30 * time.Second)
+	opts.SetPingTimeout(10 * time.Second)
+	opts.SetConnectTimeout(30 * time.Second)
 	opts.SetCleanSession(true)
 	opts.SetAutoReconnect(true)
+	opts.SetMaxReconnectInterval(1 * time.Minute)
+	opts.SetConnectRetry(true)
+	opts.SetConnectRetryInterval(5 * time.Second)
 	opts.SetConnectionLostHandler(func(client mqtt.Client, err error) {
 		fmt.Printf("MQTT connection lost: %v", err)
+	})
+
+	opts.SetOnConnectHandler(func(client mqtt.Client) {
+		fmt.Printf("MQTT connection established successfully")
 	})
 
 	client := mqtt.NewClient(opts)
