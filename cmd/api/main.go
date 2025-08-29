@@ -13,7 +13,7 @@ func main() {
 	// Get database connection string from environment variable
 	dsn := os.Getenv("POSTGRES_DSN")
 	if dsn == "" {
-		dsn = "postgresql://mqtt_user:mqtt_password@localhost:5432/mqtt_db?sslmode=disable"
+		dsn = "postgresql://mqtt_user:mqtt_password@localhost:5433/mqtt_db?sslmode=disable"
 	}
 
 	database, err := data.NewDatabase(dsn)

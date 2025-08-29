@@ -7,7 +7,7 @@ services:
       POSTGRES_USER: mqtt_user
       POSTGRES_PASSWORD: mqtt_password
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     restart: unless-stopped
@@ -22,7 +22,7 @@ services:
     container_name: mqtt_mosquitto
     ports:
       - "1883:1883"
-      - "9001:9001"
+      - "9002:9002"
     volumes:
       - mosquitto_data:/mosquitto/data
       - mosquitto_logs:/mosquitto/log
