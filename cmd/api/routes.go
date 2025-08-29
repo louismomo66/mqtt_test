@@ -45,6 +45,9 @@ func (h *APIHandler) SetupRoutes() *chi.Mux {
 		MaxAge:           300,
 	}))
 
+	// Root route
+	r.Get("/", h.rootHandler)
+
 	// Health check
 	r.Get("/health", h.healthCheck)
 
@@ -74,6 +77,21 @@ func (h *APIHandler) SetupRoutes() *chi.Mux {
 	})
 
 	return r
+}
+
+// rootHandler returns information about the API
+func (h *APIHandler) rootHandler(w http.ResponseWriter, r *http.Request) {
+	response := map[string]interface{}{
+		"service":   "MQTT Backend API",
+		"version":   "1.0.0",
+		"status":    "running",
+		"timestamp": time.Now().UTC(),
+		"endpoints": map[string]string{
+			"health": "/health",
+			"api":    "/api/v1",
+		},
+	}
+	writeJSON(w, http.StatusOK, response)
 }
 
 // healthCheck returns a simple health check response

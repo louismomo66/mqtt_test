@@ -389,13 +389,19 @@ func (m *MQTTClient) StartDeviceDataListener() error {
 	if err := m.Subscribe(mqttTopicData, m.handleDeviceData); err != nil {
 		return fmt.Errorf("failed to subscribe to topic %s: %v", mqttTopicData, err)
 	}
-	fmt.Printf("MQTT client subscribed to topic: %s", mqttTopicData)
+	fmt.Printf("MQTT client subscribed to topic: %s\n", mqttTopicData)
+
+	// Add a small delay between subscriptions to avoid overwhelming the connection
+	time.Sleep(1 * time.Second)
 
 	// Subscribe to LED control topic
 	if err := m.Subscribe(mqttTopicLED, m.handleLEDControl); err != nil {
-		return fmt.Errorf("failed to subscribe to topic %s: %v", mqttTopicLED, err)
+		// Log the error but don't fail the entire process
+		fmt.Printf("Warning: Failed to subscribe to topic %s: %v\n", mqttTopicLED, err)
+		fmt.Printf("Continuing with sensor data subscription only...\n")
+	} else {
+		fmt.Printf("MQTT client subscribed to topic: %s\n", mqttTopicLED)
 	}
-	fmt.Printf("MQTT client subscribed to topic: %s", mqttTopicLED)
 
 	// Start a goroutine to clean up stale message buffers
 	go m.cleanupStaleBuffers()
