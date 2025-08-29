@@ -1,32 +1,9 @@
 services:
-  mosquitto:
-    image: eclipse-mosquitto:2.0
-    container_name: mqtt_mosquitto
-    ports:
-      - "1883:1883"
-      - "9002:9002"
-    volumes:
-      - mosquitto_data:/mosquitto/data
-      - mosquitto_logs:/mosquitto/log
-      - ./mosquitto.conf:/mosquitto/config/mosquitto.conf
-      - ./password_file:/mosquitto/config/password_file
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD-SHELL", "mosquitto_pub -h localhost -t test -m test"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
   app:
     build: .
     container_name: mqtt_backend
-    depends_on:
-      mosquitto:
-        condition: service_healthy
     restart: unless-stopped
     ports:
       - "9005:9005"
 
 volumes:
-  mosquitto_data:
-  mosquitto_logs:

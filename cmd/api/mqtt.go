@@ -47,12 +47,14 @@ type messageBuffer struct {
 var messageBuffers = make(map[string]*messageBuffer)
 
 func NewMQTTClient(models *data.Models) (*MQTTClient, error) {
-	// Direct MQTT broker URL - use localhost for Render
-	mqttBroker := "tcp://localhost:1883"
+	// Connect to external MQTT server
+	mqttBroker := "tcp://157.230.113.253:1883"
 
 	opts := mqtt.NewClientOptions()
 	opts.AddBroker(mqttBroker)
 	opts.SetClientID(clientID)
+	opts.SetUsername("hassan")
+	opts.SetPassword("ha55an")
 	opts.SetKeepAlive(60 * time.Second)
 	opts.SetPingTimeout(1 * time.Second)
 	opts.SetCleanSession(true)
