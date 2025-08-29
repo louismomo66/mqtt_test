@@ -84,6 +84,7 @@ type DeviceDataModel interface {
 	GetBySerialNumber(serialNumber string) ([]*DeviceData, error)
 	GetByIMEI(imei string) ([]*DeviceData, error)
 	GetLatestByDeviceID(deviceID uint) (*DeviceData, error)
+	GetAllLogs() ([]*DeviceData, error)
 }
 
 // DeviceModel interface for device database operations
@@ -91,6 +92,7 @@ type DeviceModel interface {
 	CreateDevice(*Device) error
 	GetBySerialNumber(serialNumber string) (*Device, error)
 	GetByID(id uint) (*Device, error)
+	GetAllDevices() ([]*Device, error)
 	UpdateDevice(*Device) error
 	DeleteDevice(id uint) error
 }

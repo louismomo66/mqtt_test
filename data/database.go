@@ -101,6 +101,12 @@ func (m *DeviceDataModelImpl) GetLatestByDeviceID(deviceID uint) (*DeviceData, e
 	return &logEntry, nil
 }
 
+func (m *DeviceDataModelImpl) GetAllLogs() ([]*DeviceData, error) {
+	var logs []*DeviceData
+	err := m.db.Order("timestamp DESC").Find(&logs).Error
+	return logs, err
+}
+
 // DeviceModel implementation
 type DeviceModelImpl struct {
 	db *gorm.DB
@@ -134,6 +140,12 @@ func (m *DeviceModelImpl) GetByID(id uint) (*Device, error) {
 
 func (m *DeviceModelImpl) UpdateDevice(device *Device) error {
 	return m.db.Save(device).Error
+}
+
+func (m *DeviceModelImpl) GetAllDevices() ([]*Device, error) {
+	var devices []*Device
+	err := m.db.Find(&devices).Error
+	return devices, err
 }
 
 func (m *DeviceModelImpl) DeleteDevice(id uint) error {

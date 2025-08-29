@@ -106,9 +106,12 @@ func (h *APIHandler) healthCheck(w http.ResponseWriter, r *http.Request) {
 
 // getAllDevices returns all devices
 func (h *APIHandler) getAllDevices(w http.ResponseWriter, r *http.Request) {
-	// For now, return empty array since we don't have a GetAllDevices method
-	// You can implement this in your DeviceModel if needed
-	devices := []data.Device{}
+	devices, err := h.models.Device.GetAllDevices()
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, fmt.Sprintf("Failed to get devices: %v", err))
+		return
+	}
+
 	writeJSON(w, http.StatusOK, map[string]interface{}{
 		"devices": devices,
 		"count":   len(devices),
@@ -268,9 +271,12 @@ func (h *APIHandler) getDeviceLogsBySerialNumber(w http.ResponseWriter, r *http.
 
 // getAllLogs returns all device logs (with pagination)
 func (h *APIHandler) getAllLogs(w http.ResponseWriter, r *http.Request) {
-	// For now, return empty array since we don't have a GetAllLogs method
-	// You can implement this in your DeviceDataModel if needed
-	logs := []*data.DeviceData{}
+	logs, err := h.models.DeviceData.GetAllLogs()
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, fmt.Sprintf("Failed to get logs: %v", err))
+		return
+	}
+
 	writeJSON(w, http.StatusOK, map[string]interface{}{
 		"logs":  logs,
 		"count": len(logs),
