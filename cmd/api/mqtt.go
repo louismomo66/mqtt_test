@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	clientID = "devices_api"
+	clientID = "devices_api_render"
 	topic    = "device/logs"
 )
 
@@ -55,14 +55,15 @@ func NewMQTTClient(models *data.Models) (*MQTTClient, error) {
 	opts.SetClientID(clientID)
 	opts.SetUsername("hassan")
 	opts.SetPassword("ha55an")
-	opts.SetKeepAlive(30 * time.Second)
-	opts.SetPingTimeout(10 * time.Second)
-	opts.SetConnectTimeout(30 * time.Second)
-	opts.SetCleanSession(true)
+	opts.SetKeepAlive(20 * time.Second)  // More frequent keep-alive
+	opts.SetPingTimeout(5 * time.Second) // Shorter ping timeout
+	opts.SetConnectTimeout(20 * time.Second)
+	opts.SetCleanSession(false) // Keep session to avoid re-subscription issues
 	opts.SetAutoReconnect(true)
-	opts.SetMaxReconnectInterval(1 * time.Minute)
+	opts.SetMaxReconnectInterval(30 * time.Second) // Faster reconnection
 	opts.SetConnectRetry(true)
-	opts.SetConnectRetryInterval(5 * time.Second)
+	opts.SetConnectRetryInterval(3 * time.Second) // Faster retry
+	opts.SetResumeSubs(true)                      // Resume subscriptions after reconnect
 	opts.SetConnectionLostHandler(func(client mqtt.Client, err error) {
 		fmt.Printf("MQTT connection lost: %v", err)
 	})
@@ -412,6 +413,9 @@ func (m *MQTTClient) StartDeviceDataListener() error {
 	// Start a goroutine to clean up stale message buffers
 	go m.cleanupStaleBuffers()
 
+	// Start a goroutine to monitor MQTT connection health
+	go m.monitorConnection()
+
 	return nil
 }
 
@@ -430,6 +434,21 @@ func (m *MQTTClient) cleanupStaleBuffers() {
 			if buffer.IsComplete && now.Sub(buffer.ReceivedTime) > 5*time.Minute {
 				delete(messageBuffers, serialNumber)
 			}
+		}
+	}
+}
+
+func (m *MQTTClient) monitorConnection() {
+	ticker := time.NewTicker(30 * time.Second)
+	for range ticker.C {
+		if m.client != nil {
+			if m.client.IsConnected() {
+				fmt.Printf("MQTT connection status: CONNECTED\n")
+			} else {
+				fmt.Printf("MQTT connection status: DISCONNECTED - attempting to reconnect...\n")
+			}
+		} else {
+			fmt.Printf("MQTT client is nil\n")
 		}
 	}
 }
