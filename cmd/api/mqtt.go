@@ -47,8 +47,8 @@ type messageBuffer struct {
 var messageBuffers = make(map[string]*messageBuffer)
 
 func NewMQTTClient(models *data.Models) (*MQTTClient, error) {
-	// Direct MQTT broker URL
-	mqttBroker := "tcp://mosquitto:1883"
+	// Direct MQTT broker URL - use localhost for Render
+	mqttBroker := "tcp://localhost:1883"
 
 	opts := mqtt.NewClientOptions()
 	opts.AddBroker(mqttBroker)

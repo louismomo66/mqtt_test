@@ -9,8 +9,8 @@ import (
 var MQTT *MQTTClient
 
 func main() {
-	// Direct database connection string
-	dsn := "postgresql://mqtt_user:mqtt_password@postgres:5432/mqtt_db?sslmode=disable"
+	// Direct database connection string - use localhost for Render
+	dsn := "postgresql://mqtt_user:mqtt_password@localhost:5432/mqtt_db?sslmode=disable"
 	fmt.Printf("Using database connection: %s\n", dsn)
 
 	database, err := data.NewDatabase(dsn)
