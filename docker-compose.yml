@@ -1,22 +1,4 @@
 services:
-  postgres:
-    image: postgres:15-alpine
-    container_name: mqtt_postgres
-    environment:
-      POSTGRES_DB: mqtt_db
-      POSTGRES_USER: mqtt_user
-      POSTGRES_PASSWORD: mqtt_password
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U mqtt_user -d mqtt_db"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
   mosquitto:
     image: eclipse-mosquitto:2.0
     container_name: mqtt_mosquitto
@@ -39,8 +21,6 @@ services:
     build: .
     container_name: mqtt_backend
     depends_on:
-      postgres:
-        condition: service_healthy
       mosquitto:
         condition: service_healthy
     restart: unless-stopped
@@ -48,6 +28,5 @@ services:
       - "9005:9005"
 
 volumes:
-  postgres_data:
   mosquitto_data:
   mosquitto_logs:
